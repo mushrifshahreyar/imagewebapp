@@ -1,4 +1,4 @@
 #!/bin/bash
 
-python3 backend.py &
+python3 Backend/backend.py &
 flutter run --release --web-port=8080
