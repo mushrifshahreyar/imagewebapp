@@ -1,6 +1,6 @@
 FROM nexcer/flutter-web
 
-RUN git clone https://github.com/mushrifshahreyar/imageGallery.git
+RUN git clone https://github.com/mushrifshahreyar/imagewebapp.git
 
 RUN flutter channel beta
 
@@ -10,16 +10,22 @@ RUN flutter config --enable-web
 
 RUN flutter upgrade
 
-RUN mv imageGallery/ project1
+RUN apt-get update
 
-RUN cd project1/
+RUN apt-get install -y python python3-pip
 
-RUN flutter create project1
+RUN mv imagewebapp/ project1
 
 WORKDIR /project1/
 
-CMD flutter run --release --web-port=8080
+RUN flutter create .
 
-# RUN cd 
+RUN pip3 install -r Backend/requirements.txt
+
+RUN chmod +x run.bash
+
+CMD ./run.bash 
+
 EXPOSE 8080
+
 
