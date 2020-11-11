@@ -31,6 +31,10 @@ class Images(db.Document):
 	def to_json(self):
 		return {'name': self.name, 'image': self.image, 'metadata': self.metadata}
 
+@app.route('/', methods=['GET'])
+def hello():
+	return jsonify({"hello" : "world"})
+
 # Publishing the data in json format
 @app.route('/get_image_data', methods=['GET'])
 def get_image_data():
@@ -160,4 +164,4 @@ def get_query(json_query):
 	return query
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run(debug=True, host='0.0.0.0')
