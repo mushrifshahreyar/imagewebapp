@@ -63,18 +63,18 @@ class _MyHomePageState extends State<MyHomePage> {
     1: 'Exposure',
     2: 'XResolution',
     3: 'YResolution',
-    4: 'ISO',
+    4: 'FocalLength',
     5: 'Make',
   };
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
-    Future.delayed(Duration(milliseconds: 5000), () {
-      setState(() {
-        MyApp.isLoading = false;
-      });
-    });
+    // Future.delayed(Duration(milliseconds: 5000), () {
+    //   setState(() {
+    //     MyApp.isLoading = false;
+    //   });
+    // });
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -143,36 +143,37 @@ class _MyHomePageState extends State<MyHomePage> {
             searchForm(),
             Flexible(
               flex: 1,
-              child: FutureBuilder(
-                  future: getImagedata(),
-                  builder: (context, snapshot1) {
-                    if (snapshot1.hasData) {
-                      return StaggeredGridView.countBuilder(
-                        crossAxisCount: (width / 275).floor(),
-                        itemCount: snapshot1.data.length,
-                        itemBuilder: (context, index) {
-                          MyApp.isLoading = false;
-
-                          String url = 'http://127.0.0.1:5000/getimage/' +
-                              snapshot1.data[index].id;
-                          return Container(
-                              margin: EdgeInsets.all(5.0),
-                              padding: EdgeInsets.all(5.0),
-                              child: Image.network(
-                                url,
-                                fit: BoxFit.contain,
-                              ));
-                        },
-                        staggeredTileBuilder: (int index) {
-                          return StaggeredTile.fit(1);
-                        },
-                        mainAxisSpacing: 4.0,
-                        crossAxisSpacing: 4.0,
-                      );
-                    } else {
-                      return Container();
-                    }
-                  }),
+              child: StaggeredGridView.countBuilder(
+                crossAxisCount: (width / 275).floor(),
+                itemCount: imageDatas.length,
+                itemBuilder: (context, index) {
+                  String url =
+                      'http://127.0.0.1:5000/getimage/' + imageDatas[index].id;
+                  Map<String, dynamic> meta = imageDatas[index].metadata;
+                  String features = '';
+                  meta.forEach((key, value) {
+                    features +=
+                        "\n" + key.toString() + " : " + value.toString();
+                  });
+                  return InkWell(
+                    onTap: () {
+                      showImageDialog(imageDatas[index], features);
+                    },
+                    child: Container(
+                        margin: EdgeInsets.all(5.0),
+                        padding: EdgeInsets.all(5.0),
+                        child: Image.network(
+                          url,
+                          fit: BoxFit.contain,
+                        )),
+                  );
+                },
+                staggeredTileBuilder: (int index) {
+                  return StaggeredTile.fit(1);
+                },
+                mainAxisSpacing: 4.0,
+                crossAxisSpacing: 4.0,
+              ),
             )
           ],
         ),
@@ -185,24 +186,65 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void showImageDialog(ImageObject imageObject, String features) {
+    String url = 'http://127.0.0.1:5000/getimage/' + imageObject.id;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              "Image Data",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  letterSpacing: 0.8,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600),
+            ),
+            content: Container(
+              width: MediaQuery.of(context).size.width / 2,
+              height: MediaQuery.of(context).size.height,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                        margin: EdgeInsets.all(5.0),
+                        padding: EdgeInsets.all(5.0),
+                        child: Image.network(
+                          url,
+                          fit: BoxFit.contain,
+                        )),
+                    Text(features, textAlign: TextAlign.start),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
-    imageDatas.clear();
-    // getImagedata();
+
+    getImagedata();
   }
 
-  Future<List<ImageObject>> getImagedata() async {
-    List<ImageObject> temp = [];
-    var response = await http.get("http://127.0.0.1:5000/get_image_data");
-    var datas = json.decode(response.body);
-    // print(datas);
-    for (var data in datas) {
-      ImageObject temp1 = new ImageObject(data['id'], data['name']);
-      temp.add(temp1);
-    }
-
-    return temp;
+  void getImagedata() {
+    imageDatas.clear();
+    http.get("http://127.0.0.1:5000/get_image_data").then((value) {
+      var datas = json.decode(value.body);
+      for (var data in datas) {
+        ImageObject temp1 =
+            new ImageObject(data['id'], data['name'], data['metadata']);
+        setState(() {
+          imageDatas.add(temp1);
+        });
+      }
+      setState(() {
+        MyApp.isLoading = false;
+      });
+    });
   }
 
   // ------ uploading element------------
@@ -217,8 +259,8 @@ class _MyHomePageState extends State<MyHomePage> {
         final reader = FileReader();
         reader.readAsDataUrl(file);
         reader.onLoadEnd.listen((event) {
-          print("loading");
-          print(file.name.toString());
+          // print("loading");
+          // print(file.name.toString());
           String str = reader.result.toString();
           setState(() {
             MyApp.isLoading = true;
@@ -237,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .post("http://127.0.0.1:5000/create_record",
             body: json.encode({'name': name, 'url': url}))
         .then((value) {
-      print("uploaded");
+      // print("uploaded");
       setState(() {
         MyApp.isLoading = false;
       });
@@ -389,6 +431,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                   )
                 : Container(),
+            RaisedButton(
+              child: Text("clear"),
+              onPressed: () {
+                // handleFormclear();
+                setState(() {
+                  MyApp.isLoading = true;
+                });
+                getImagedata();
+              },
+            ),
           ])
         ],
       ),
@@ -396,12 +448,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void handleFormSubmit() {
-    print("pressed");
     if (_searchFormKey.currentState.validate()) {
       _searchFormKey.currentState.save();
-      print(_keySearchValue);
-      print(_comparatorSearchValue);
-      print(_searchTextfield);
+      // print(_keySearchValue);
+      // print(_comparatorSearchValue);
+      // print(_searchTextfield);
 
       var query = [];
 
@@ -413,11 +464,25 @@ class _MyHomePageState extends State<MyHomePage> {
         };
         query.add(temp);
       }
-      print(query);
+      // print(query);
+      setState(() {
+        MyApp.isLoading = true;
+        imageDatas.clear();
+      });
+
       http
           .post("http://127.0.0.1:5000/query_records", body: json.encode(query))
           .then((value) {
-        print(value.body);
+        var datas = json.decode(value.body);
+        for (var data in datas) {
+          setState(() {
+            imageDatas
+                .add(ImageObject(data['id'], data['name'], data['metadata']));
+          });
+        }
+        setState(() {
+          MyApp.isLoading = false;
+        });
       });
     }
   }

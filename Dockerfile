@@ -12,11 +12,9 @@ RUN flutter upgrade
 
 RUN apt-get install -y python python3-pip
 
-RUN git clone https://github.com/mushrifshahreyar/imagewebapp.git
-
-RUN mv imagewebapp/ project1
-
 WORKDIR /project1/
+
+COPY . .
 
 RUN flutter create .
 
