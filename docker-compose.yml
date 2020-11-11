@@ -1,0 +1,19 @@
+version: "3"
+services: 
+  app: 
+    build: .
+    container_name: flaskflutter
+    restart: unless-stopped
+    image: flaskflutter
+    ports: 
+      - '5000:5000'
+      - '8080:8080'
+    links:
+      - mongodb
+      
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.4
+    ports: 
+      - '27017:27017'  
+        

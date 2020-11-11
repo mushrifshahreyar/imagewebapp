@@ -13,12 +13,15 @@ app = Flask(__name__)
 
 app.config['MONGODB_SETTINGS'] = {
 	'db': 'Gallery',
-	'port': 27017
+	'host': 'mongodb://mongodb:27017/imagedb',
+	'port': 27017,
+	
 }
 
 CORS(app=app)
 
 db = MongoEngine()
+
 db.init_app(app)
 
 class Images(db.Document):

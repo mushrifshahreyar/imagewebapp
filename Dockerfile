@@ -28,7 +28,7 @@ EXPOSE 8080
 
 EXPOSE 5000
 
-CMD ./run.bash 
+CMD ./run.bash
 
 
 
