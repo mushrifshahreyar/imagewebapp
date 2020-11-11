@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<int> _keySearchValue = [0, 0, 0, 0, 0, 0];
   List<int> _comparatorSearchValue = [0, 0, 0, 0, 0, 0];
   String email = '';
-  final String final_url = "http://52.140.102.68:5000/";
+  final String finalurl = "http://52.172.161.185:5000/";
   String password = '';
   int itemCount = 0;
   final _formKey = GlobalKey<FormState>();
@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Map<int, String> keyValueMapping = {
     0: 'Flash',
-    1: 'Exposure',
+    1: 'ApertureValue',
     2: 'XResolution',
     3: 'YResolution',
     4: 'FocalLength',
@@ -72,11 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
 
-    // Future.delayed(Duration(milliseconds: 5000), () {
-    //   setState(() {
-    //     MyApp.isLoading = false;
-    //   });
-    // });
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -149,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisCount: (width / 275).floor(),
                 itemCount: imageDatas.length,
                 itemBuilder: (context, index) {
-                  String url = final_url + 'getimage/' + imageDatas[index].id;
+                  String url = finalurl + 'getimage/' + imageDatas[index].id;
                   Map<String, dynamic> meta = imageDatas[index].metadata;
                   String features = '';
                   meta.forEach((key, value) {
@@ -188,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void showImageDialog(ImageObject imageObject, String features) {
-    String url = final_url + 'getimage/' + imageObject.id;
+    String url = finalurl + 'getimage/' + imageObject.id;
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -233,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getImagedata() {
     imageDatas.clear();
-    http.get(final_url + "get_image_data").then((value) {
+    http.get(finalurl + "get_image_data").then((value) {
       var datas = json.decode(value.body);
       for (var data in datas) {
         ImageObject temp1 =
@@ -249,7 +244,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // ------ uploading element------------
-
   void uploadImage() {
     if (MyApp.isLoggedIn) {
       InputElement inputElement = FileUploadInputElement()..accept = 'image/*';
@@ -260,8 +254,6 @@ class _MyHomePageState extends State<MyHomePage> {
         final reader = FileReader();
         reader.readAsDataUrl(file);
         reader.onLoadEnd.listen((event) {
-          // print("loading");
-          // print(file.name.toString());
           String str = reader.result.toString();
           setState(() {
             MyApp.isLoading = true;
@@ -277,15 +269,13 @@ class _MyHomePageState extends State<MyHomePage> {
 // API linking for uploading image
   void upload(String name, String url) {
     http
-        .post(final_url + "/create_record",
+        .post(finalurl + "/create_record",
             body: json.encode({'name': name, 'url': url}))
         .then((value) {
-      // print("uploaded");
       setState(() {
         MyApp.isLoading = false;
         getImagedata();
       });
-      // print(json.decode(value.body));
     });
   }
 
@@ -324,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     //Password
                     new TextFormField(
-                      obscureText: true, // Use secure text for passwords.
+                      obscureText: true,
                       decoration: new InputDecoration(
                           hintText: 'Password',
                           labelText: 'Enter your password'),
@@ -375,7 +365,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void submit() {
-    // First validate form.
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
 
@@ -436,7 +425,6 @@ class _MyHomePageState extends State<MyHomePage> {
             RaisedButton(
               child: Text("clear"),
               onPressed: () {
-                // handleFormclear();
                 setState(() {
                   MyApp.isLoading = true;
                 });
@@ -452,9 +440,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void handleFormSubmit() {
     if (_searchFormKey.currentState.validate()) {
       _searchFormKey.currentState.save();
-      // print(_keySearchValue);
-      // print(_comparatorSearchValue);
-      // print(_searchTextfield);
 
       var query = [];
 
@@ -466,14 +451,14 @@ class _MyHomePageState extends State<MyHomePage> {
         };
         query.add(temp);
       }
-      // print(query);
+
       setState(() {
         MyApp.isLoading = true;
         imageDatas.clear();
       });
 
       http
-          .post(final_url + "query_records", body: json.encode(query))
+          .post(finalurl + "query_records", body: json.encode(query))
           .then((value) {
         var datas = json.decode(value.body);
         for (var data in datas) {
@@ -490,7 +475,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget searchBox(int index) {
-    // print(index);
     return Container(
       width: 450,
       height: 75,
@@ -523,7 +507,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget textField(index) {
     return TextFormField(
-      keyboardType: TextInputType.number,
+      keyboardType: _keySearchValue[index] == 5
+          ? TextInputType.text
+          : TextInputType.number,
       validator: (val) {
         if (_keySearchValue[index] == 5) {
           if (val.contains(new RegExp(r'[0-9]'))) {
@@ -545,7 +531,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget keyField(index) {
     List<DropdownMenuItem> _dropdownmenuItems = [];
     for (int i = 0; i < keyValueMapping.length; ++i) {
-      // print(keyvalues[i]);
       _dropdownmenuItems.add(DropdownMenuItem(
         child: Text(keyValueMapping[i]),
         value: i,

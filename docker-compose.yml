@@ -1,15 +1,13 @@
 version: "3"
 services: 
   app: 
-    build: 
-      context: .
-      network: host
+    build: .
     container_name: flaskflutter
     restart: unless-stopped
     image: flaskflutter
     ports: 
       - '5000:5000'
-      - '8080:8080'
+      - '80:8080'
     links:
       - mongodb
   

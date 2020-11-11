@@ -68,7 +68,6 @@ def create_record():
 	urllib.request.urlretrieve(url, name)
 	my_image = Image.open(name)
 	metadata = get_metadata(my_image)
-	print(metadata)
 	my_image.close()
 
 	date_time = datetime.now()
@@ -81,7 +80,6 @@ def create_record():
 		os.remove(name)		
 	
 	return jsonify({'status': 'image uploaded'})
-	
 
 # Extracting metadata from image
 def get_metadata(image):
