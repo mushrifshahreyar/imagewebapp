@@ -15,7 +15,6 @@ app.config['MONGODB_SETTINGS'] = {
 	'db': 'Gallery',
 	'host': 'mongodb://mongodb:27017/imagedb',
 	'port': 27017,
-	
 }
 
 CORS(app=app)
