@@ -16,6 +16,7 @@ void main() {
 class MyApp extends StatelessWidget {
   static bool isLoggedIn = false;
   static bool isLoading = true;
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -45,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<int> _keySearchValue = [0, 0, 0, 0, 0, 0];
   List<int> _comparatorSearchValue = [0, 0, 0, 0, 0, 0];
   String email = '';
+  final String final_url = "http://52.140.102.68:5000/";
   String password = '';
   int itemCount = 0;
   final _formKey = GlobalKey<FormState>();
@@ -147,8 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisCount: (width / 275).floor(),
                 itemCount: imageDatas.length,
                 itemBuilder: (context, index) {
-                  String url =
-                      'http://127.0.0.1:5000/getimage/' + imageDatas[index].id;
+                  String url = final_url + 'getimage/' + imageDatas[index].id;
                   Map<String, dynamic> meta = imageDatas[index].metadata;
                   String features = '';
                   meta.forEach((key, value) {
@@ -187,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void showImageDialog(ImageObject imageObject, String features) {
-    String url = 'http://127.0.0.1:5000/getimage/' + imageObject.id;
+    String url = final_url + 'getimage/' + imageObject.id;
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -232,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getImagedata() {
     imageDatas.clear();
-    http.get("http://127.0.0.1:5000/get_image_data").then((value) {
+    http.get(final_url + "get_image_data").then((value) {
       var datas = json.decode(value.body);
       for (var data in datas) {
         ImageObject temp1 =
@@ -276,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
 // API linking for uploading image
   void upload(String name, String url) {
     http
-        .post("http://127.0.0.1:5000/create_record",
+        .post(final_url + "/create_record",
             body: json.encode({'name': name, 'url': url}))
         .then((value) {
       // print("uploaded");
@@ -471,7 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       http
-          .post("http://127.0.0.1:5000/query_records", body: json.encode(query))
+          .post(final_url + "query_records", body: json.encode(query))
           .then((value) {
         var datas = json.decode(value.body);
         for (var data in datas) {
