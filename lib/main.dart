@@ -283,6 +283,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // print("uploaded");
       setState(() {
         MyApp.isLoading = false;
+        getImagedata();
       });
       // print(json.decode(value.body));
     });
