@@ -241,6 +241,9 @@ class _MyHomePageState extends State<MyHomePage> {
         MyApp.isLoading = false;
       });
     });
+    setState(() {
+      MyApp.isLoading = false;
+    });
   }
 
   // ------ uploading element------------

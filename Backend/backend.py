@@ -15,6 +15,7 @@ app.config['MONGODB_SETTINGS'] = {
 	'db': 'Gallery',
 	'host': 'mongodb://mongodb:27017/imagedb',
 	'port': 27017,
+	
 }
 
 CORS(app=app)
@@ -67,6 +68,7 @@ def create_record():
 	urllib.request.urlretrieve(url, name)
 	my_image = Image.open(name)
 	metadata = get_metadata(my_image)
+	print(metadata)
 	my_image.close()
 
 	date_time = datetime.now()
@@ -79,6 +81,7 @@ def create_record():
 		os.remove(name)		
 	
 	return jsonify({'status': 'image uploaded'})
+	
 
 # Extracting metadata from image
 def get_metadata(image):
@@ -165,4 +168,3 @@ def get_query(json_query):
 
 if __name__ == "__main__":
 	app.run(debug=True, host='0.0.0.0')
-	# app.run(debug=True)
