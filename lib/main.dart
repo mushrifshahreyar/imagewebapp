@@ -58,6 +58,9 @@ class _MyHomePageState extends State<MyHomePage> {
     0: '==',
     1: '<=',
     2: '>=',
+    3: '<',
+    4: '>',
+    5: '!=',
   };
 
   Map<int, String> keyValueMapping = {
